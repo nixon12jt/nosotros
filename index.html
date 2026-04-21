@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestros 5 Meses ❤️</title>
+    <style>
+        :root {
+            --color-fondo: #fff0f3;
+            --color-primario: #ff4d6d;
+            --color-secundario: #ff85a1;
+            --color-texto: #800e13;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .contenedor {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.2);
+            max-width: 85%;
+            width: 450px;
+            z-index: 10;
+        }
+
+        /* Estado Bloqueado */
+        #pantallaBloqueada { display: block; }
+        
+        /* Estado Desbloqueado (Oculto al inicio) */
+        #pantallaPrincipal { display: none; }
+
+        .contador-atras {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-primario);
+            margin: 20px 0;
+            letter-spacing: 1px;
+        }
+
+        .foto-perfil {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 5px solid var(--color-primario);
+            object-fit: cover;
+            margin-bottom: 1rem;
+            animation: latido 2s infinite;
+        }
+
+        @keyframes latido {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            background-color: var(--color-primario);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+        }
+
+        #btnNo { background-color: #f8ad9d; margin-left: 10px; }
+
+        .sorpresa { display: none; margin-top: 1.5rem; animation: aparecer 1s ease; }
+
+        @keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+
+        .corazon-caida {
+            position: fixed; top: -10%; z-index: 1; user-select: none;
+            pointer-events: none; animation: caida linear forwards;
+        }
+
+        @keyframes caida { to { transform: translateY(110vh) rotate(360deg); } }
+
+        .contador {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 10px;
+            background: #fff0f3;
+            border-radius: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="pantallaBloqueada" class="contenedor">
+        <div style="font-size: 4rem;">🔒</div>
+        <h2>Casi llegamos...</h2>
+        <p>Tu sorpresa se desbloqueará en:</p>
+        <div id="countdown" class="contador-atras">Calculando...</div>
+        <button id="btnIniciar" class="btn" style="display: none;" onclick="desbloquear()">✨ ¡INICIAR! ✨</button>
+    </div>
+
+    <div id="pantallaPrincipal" class="contenedor">
+        <img src="assets/nosotros.jpeg" alt="Nosotros" class="foto-perfil">
+        <h1>¡Felices 5 Meses! ❤️</h1>
+
+        <div class="contador" id="tiempo">
+            Cargando nuestro tiempo juntos...
+        </div>
+
+        <p>Cinco meses contigo y siento que apenas empieza la mejor historia de mi vida.</p>
+        <p></p>
+        <p><strong>¿Seguimos escribiendo esta historia juntos?</strong></p>
+
+        <div id="areaBotones">
+            <button class="btn" onclick="celebrar()">¡SÍ!</button>
+            <button class="btn" id="btnNo" onmouseover="escapar(this)" onclick="escapar(this)">No</button>
+        </div>
+
+        <div class="sorpresa" id="contenidoSorpresa">
+            <!-- <h2>¡Sabía que dirías que sí! 😍</h2> -->
+            <p>Sigamos escribiendo esta historia juntos ✨❤️. Porque en estos cinco meses descubrí que contigo todo tiene más sentido, que cada risa tuya ilumina mis días 😊 y cada momento a tu lado se vuelve inolvidable 💫. No sé qué nos depare el futuro, pero sí sé que lo quiero vivir contigo 💕. Quiero seguir tomando tu mano, seguir creando recuerdos, seguir eligiéndote cada día 🫶. Porque si esta historia es contigo… definitivamente es la más bonita que podría tener ❤️✨</p>
+            <div style="font-size: 3rem;">💖🌹✨</div>
+        </div>
+    </div>
+
+    <audio id="musica" loop>
+        <source src="assets/cancion.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+
+        // --- 1. CONFIGURACIÓN DEL TIEMPO ---
+        // Cambia la fecha por el día que se hicieron novios (Año, Mes-1, Día)
+        // Ejemplo: Si empezaron el 22 de Noviembre de 2025: (2025, 10, 22) el mes es -1
+        const fechaInicio = new Date(2025, 10, 22); 
+
+        function actualizarContador() {
+            const ahora = new Date();
+            const diferencia = ahora - fechaInicio;
+
+            const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diferencia / (1000 * 60 * 60)) % 24);
+            const minutos = Math.floor((diferencia / 1000 / 60) % 60);
+            const segundos = Math.floor((diferencia / 1000) % 60);
+
+            document.getElementById('tiempo').innerHTML = 
+                `${dias} días, ${horas}h, ${minutos}m y ${segundos}s`;
+        }
+        setInterval(actualizarContador, 1000);
+
+
+
+        // --- CONFIGURACIÓN DE LA FECHA DE LOS 5 MESES ---
+        // Pon aquí la fecha exacta en la que se cumplen los 5 meses
+        // Formato: (Año, Mes-1, Día, Hora, Minutos)
+        const fechaMeta = new Date(2026, 3, 20, 0, 0).getTime(); // Ejemplo: 20 de Abril
+
+        const timer = setInterval(function() {
+            const ahora = new Date().getTime();
+            const distancia = fechaMeta - ahora;
+
+            // Cálculos de tiempo
+            const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+
+            // Mostrar el resultado
+            document.getElementById("countdown").innerHTML = dias + "d " + horas + "h "
+            + minutos + "m " + segundos + "s ";
+
+            // Si la fecha ya pasó
+            if (distancia < 0) {
+                clearInterval(timer);
+                document.getElementById("countdown").style.display = "none";
+                document.getElementById("btnIniciar").style.display = "inline-block";
+                document.querySelector("#pantallaBloqueada h2").innerText = "¡Llegó el momento!";
+            }
+        }, 1000);
+
+        function desbloquear() {
+            document.getElementById("pantallaBloqueada").style.display = "none";
+            document.getElementById("pantallaPrincipal").style.display = "block";
+            // La música empieza aquí al dar clic en iniciar
+            document.getElementById("musica").play();
+        }
+
+        function escapar(btn) {
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+            btn.style.position = "fixed";
+            btn.style.left = x + "px";
+            btn.style.top = y + "px";
+        }
+
+        function celebrar() {
+            document.getElementById('contenidoSorpresa').style.display = 'block';
+            document.getElementById('areaBotones').style.display = 'none';
+            lluviaCorazones();
+        }
+
+        function lluviaCorazones() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const corazon = document.createElement('div');
+                    corazon.innerHTML = '❤️';
+                    corazon.classList.add('corazon-caida');
+                    corazon.style.left = Math.random() * 100 + 'vw';
+                    corazon.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                    corazon.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(corazon);
+                }, i * 100);
+            }
+        }
+    </script>
+</body>
+</html>
